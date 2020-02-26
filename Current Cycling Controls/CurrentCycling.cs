@@ -13,7 +13,7 @@ namespace Current_Cycling_Controls {
     public class CurrentCycling {
         public event TDKEvent UpdateUI;
         private SerialPort _serTDK;
-        //private BackgroundWorker _reportWorker = new BackgroundWorker();
+        private DateTime _cycleTimer = DateTime.Now;
         private Stopwatch _timer;
         private bool _timeOut;
         public List<TDK> _TDK;
@@ -29,21 +29,33 @@ namespace Current_Cycling_Controls {
 
         public void StartCycling(StartCyclingArgs args) {
             // start serial interface stuff/ start timers
-            //_TDK = args.TDK;
             var tdk = args.TDK;
             try {
                 OpenPorts(); // TODO: MOVE TO FRMMAIN()
-                foreach (var t in tdk) {                    
-                    TurnON(t);
-                    SetCurrentVoltage(t);
+                foreach (var t in tdk) {
+                    try {
+                        SetAddress(t);
+                        SetCurrentVoltage(t);
+                    }
+                    catch (TimeoutException exc) {
+                        Console.WriteLine($"TIMEOUT ON PORT #{t.Port}");
+                        throw new Exception(exc.Message);
+                    }
+                    
                 }
 
-                StartTimer();
                 // Loop forever until we get a stop command from main thread
                 while (true) {
+                    foreach (var t in tdk) {
+                        TurnON(t);
+                    }
+                    StartTimer();
                     // BIAS ON
+                    _cycleTimer = DateTime.Now.AddMilliseconds(args.BiasOnTime);
                     while (_timer.ElapsedMilliseconds < args.BiasOnTime && !STOP) {
                         foreach (var tt in tdk) {
+                            SetAddress(tt);
+
                             _serTDK.Write("MV?\r\n");
                             Wait(50); // lag in measured value
                             string volt = _serTDK.ReadLine();
@@ -51,13 +63,15 @@ namespace Current_Cycling_Controls {
                             _serTDK.Write("MC?\r\n");
                             Wait(50);
                             string current = _serTDK.ReadLine();
-                            _args = new GUIArgs(volt, current, tt.CycleCount);
+                            _args = new GUIArgs(volt, current, tt.CycleCount, tt.Port, _cycleTimer);
                             NewCoreCommand?.Invoke(this, new CoreCommand() { Type = U.CmdType.UpdateUI });
                         }
                     }
-                    if (!STOP) break;
+                    if (STOP) break;
                     // BIAS OFF
                     TurnOff(tdk);
+                    StartTimer();
+                    _cycleTimer = DateTime.Now.AddMilliseconds(args.BiasOffTime);
                     while (_timer.ElapsedMilliseconds < args.BiasOffTime && !STOP) {
                         foreach (var tt in tdk) {
                             _serTDK.Write("MV?\r\n");
@@ -67,25 +81,23 @@ namespace Current_Cycling_Controls {
                             _serTDK.Write("MC?\r\n");
                             Wait(50);
                             string current = _serTDK.ReadLine();
-                            _args = new GUIArgs(volt, current, tt.CycleCount);
+                            _args = new GUIArgs(volt, current, tt.CycleCount, tt.Port, _cycleTimer);
                             NewCoreCommand?.Invoke(this, new CoreCommand() { Type = U.CmdType.UpdateUI });
                         }
                     }
-                    if (!STOP) break;
+                    if (STOP) break;
 
                     // completed a bias on/off cycle
                     foreach (var ttt in tdk) {
                         ttt.CycleCount++;
                     }
+
                 }               
             }
             catch (Exception exc) {
                 Console.WriteLine($"{exc}");
                 TurnOffClose(tdk);
                 STOP = false;
-                foreach (var tttt in tdk) {
-                    tttt.CycleCount++;
-                }
             }
 
             STOP = false;
@@ -93,15 +105,45 @@ namespace Current_Cycling_Controls {
         }
 
         private void OpenPorts() {
-            _serTDK.BaudRate = U.BaudRate;
-            _serTDK.PortName = U.COMPort;
-            _serTDK.NewLine = "\r";
-            _serTDK.ReadTimeout = 1000;
-            _serTDK.Open();
+            string[] ports = SerialPort.GetPortNames();
+            // only one COM port available
+            if (ports.Length == 1) {
+                _serTDK.BaudRate = U.BaudRate;
+                _serTDK.PortName = ports.FirstOrDefault();
+                _serTDK.NewLine = "\r";
+                _serTDK.ReadTimeout = 1000;
+                _serTDK.Open();
+
+                _serTDK.DiscardOutBuffer();
+                _serTDK.DiscardInBuffer();
+                return;
+            }
+            foreach (var port in ports) { // ping each port and see if we get the correct response
+                try {
+                    _serTDK.BaudRate = U.BaudRate;
+                    _serTDK.PortName = U.COMPort;
+                    _serTDK.NewLine = "\r";
+                    _serTDK.ReadTimeout = 1000;
+                    _serTDK.Open();
+
+                    _serTDK.Write("ADR " + "01" + "\r\n");
+                    if (_serTDK.ReadLine() == "OK") {
+                        _serTDK.DiscardOutBuffer();
+                        _serTDK.DiscardInBuffer();
+                        return;
+                    }
+                }
+                catch { }
+            }
+
 
             
-            _serTDK.DiscardOutBuffer();
-            _serTDK.DiscardInBuffer();
+        }
+
+        private void SetAddress(TDK tdk) {
+            // Sets the address of the power supply
+            _serTDK.Write("ADR " + tdk.Address + "\r\n");
+            if (_serTDK.ReadLine() == "OK") { }
         }
 
         private void SetCurrentVoltage(TDK tdk) {
@@ -111,7 +153,7 @@ namespace Current_Cycling_Controls {
                 if (_serTDK.ReadLine() == "OK") {
                     Console.WriteLine($"Current: OKAY");
                 }
-                _serTDK.Write("MC?\r\n");
+                _serTDK.Write("PC?\r\n");
             } while (_serTDK.ReadLine() == tdk.Current);
 
             do {
@@ -120,17 +162,14 @@ namespace Current_Cycling_Controls {
                 if (_serTDK.ReadLine() == "OK") {
                     Console.WriteLine($"Voltage: OKAY");
                 }
-                _serTDK.Write("MC?\r\n");
+                _serTDK.Write("PC?\r\n");
             } while (_serTDK.ReadLine() == U.VoltageCompliance);
             
         }
 
         private void TurnON(TDK tdk) {
             // Sets the address of the power supply
-            _serTDK.Write("ADR " + tdk.Address + "\r\n");
-            if (_serTDK.ReadLine() == "OK") {
-                Console.WriteLine($"Open: OKAY");
-            }
+            SetAddress(tdk);
 
             do {
                 _serTDK.Write("OUT ON\r\n");
@@ -186,10 +225,14 @@ namespace Current_Cycling_Controls {
         public string Volt { get; set; }
         public string Current { get; set; }
         public string Cycle { get; set; }
-        public GUIArgs(string volt, string current, int cycle){
+        public DateTime CycleTime { get; set; }
+        public int Port { get; set; }
+        public GUIArgs(string volt, string current, int cycle, int port, DateTime dt){
             Volt = volt;
             Current = current;
             Cycle = cycle.ToString();
+            Port = port;
+            CycleTime = dt;
         }
     }
 

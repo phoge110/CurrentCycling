@@ -16,7 +16,8 @@ namespace Current_Cycling_Controls {
             Sequence,
             StartCycling,
             UpdateUI,
-            StopCycling
+            StopCycling,
+            CleanGUI
         }
 
         public enum Status {

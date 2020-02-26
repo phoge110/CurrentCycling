@@ -17,14 +17,17 @@ namespace Current_Cycling_Controls
         private readonly AutoResetEvent _commReset = new AutoResetEvent(false);
         private BackgroundWorker _commWorker = new BackgroundWorker();
         private BackgroundWorker _TDKWorker = new BackgroundWorker();
+        private BackgroundWorker _arduinoWorker = new BackgroundWorker();
         private readonly Queue<CoreCommand> _commandQueue = new Queue<CoreCommand>();
         private CurrentCycling _cycling = new CurrentCycling();
+        private ArduinoMachine _arduino = new ArduinoMachine();
         private int _count;
         private readonly object _lock = new object();
         private List<TDK> _TDKS;
         private List<CheckBox> _checkBoxes;
         private List<TextBox> _tempSensors;
         private List<TextBox> _setCurrents;
+        private DateTime _cycleTimer = DateTime.Now;
         public frmMain()
         {
             InitializeComponent();
@@ -37,6 +40,9 @@ namespace Current_Cycling_Controls
 
             _TDKWorker.DoWork += RunCurrentCycling;
             _TDKWorker.RunWorkerCompleted += CyclingComplete;
+
+            _arduinoWorker.DoWork += RunArduinoLoop;
+
 
             _cycling.NewCoreCommand += NewCoreCommand;
 
@@ -55,7 +61,7 @@ namespace Current_Cycling_Controls
             for (int i = 1; i <13; i++) {
                 _TDKS.Add(new TDK("0" + i, i));
             }
-            
+
 
         }
 
@@ -66,7 +72,15 @@ namespace Current_Cycling_Controls
 
         private void CyclingComplete(object s, RunWorkerCompletedEventArgs e) {
             // clean up TDKs and maybe graph/show output results to file?
-            NewCoreCommand(this, new CoreCommand { Type = U.CmdType.UpdateUI }); // TODO: SET GUI OBJECTS AS ENABLED
+            NewCoreCommand(this, new CoreCommand { Type = U.CmdType.CleanGUI });
+            foreach (var t in _TDKS) {
+                t.Current = null;
+            }
+        }
+
+        private void RunArduinoLoop(object s, DoWorkEventArgs e) {
+            var tdk = (StartCyclingArgs)e.Argument;
+            _arduino.StartArduinoMachine();
         }
 
 
@@ -112,7 +126,7 @@ namespace Current_Cycling_Controls
                 Info("Got null command");
                 return;
             }
-            Info(c);
+            //Info(c);
             switch (c.Type) {
                 case U.CmdType.None:
                     break;
@@ -126,6 +140,9 @@ namespace Current_Cycling_Controls
                     break;
                 case U.CmdType.StopCycling:
                     _cycling.STOP = true;
+                    break;
+                case U.CmdType.CleanGUI:
+                    _commWorker.ReportProgress(1);
                     break;
             }
         }
@@ -141,14 +158,32 @@ namespace Current_Cycling_Controls
         private void UpdateUi(object sender, ProgressChangedEventArgs e) {
             try {
                 _count = 0;
+                // update TDK readings
                 if (e.ProgressPercentage == 5) {
                     var args = _cycling._args;
                     lblVoltage1.Text = (string)args.Volt;
                     lblCurrent1.Text = (string)args.Current;
                     lblCycle1.Text = (string)args.Cycle;
+                    // figure out how to update the other lbls if they are active
+
+
+
+                    var ts = (args.CycleTime - DateTime.Now);
+                    labelCount.Text = $@"{ts.Minutes:D2}:{ts.Seconds:D2}";
                     return;
                 }
-                else if (e.ProgressPercentage == 0) {
+                // enable GUI buttons
+                else if (e.ProgressPercentage == 1) {
+                    foreach (var chk in _checkBoxes) {
+                        chk.Enabled = true;
+                    }
+                    foreach (var temp in _tempSensors) {
+                        temp.Enabled = true;
+                    }
+                    foreach (var curr in _setCurrents) {
+                        curr.Enabled = true;
+                    }
+                    btnStart.Enabled = true;
                     return;
                 }
             }
@@ -163,7 +198,7 @@ namespace Current_Cycling_Controls
         private void BtnStart_Click(object sender, EventArgs e) {
             CheckPorts();
             var startargs = new StartCyclingArgs(_TDKS.Where(t => t.Current != null).ToList(), 
-                int.Parse(txtBiasOn.Text), int.Parse(txtBiasOff.Text));
+                Double.Parse(txtBiasOn.Text), Double.Parse(txtBiasOff.Text));
 
             var start = new CoreCommand {
                 Type = U.CmdType.StartCycling,

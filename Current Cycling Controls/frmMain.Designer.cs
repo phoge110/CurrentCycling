@@ -27,12 +27,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title5 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title6 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.btnSamplesList = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.txtSetCurr12 = new System.Windows.Forms.TextBox();
@@ -222,6 +222,7 @@
             this.chkTemp = new System.Windows.Forms.CheckedListBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.labelCount = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chtSmoke)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chtTemperature)).BeginInit();
@@ -2137,27 +2138,27 @@
             // 
             // chtSmoke
             // 
-            chartArea1.Name = "chaSmoke";
-            this.chtSmoke.ChartAreas.Add(chartArea1);
+            chartArea5.Name = "chaSmoke";
+            this.chtSmoke.ChartAreas.Add(chartArea5);
             this.chtSmoke.Location = new System.Drawing.Point(7, 597);
             this.chtSmoke.Margin = new System.Windows.Forms.Padding(4);
             this.chtSmoke.Name = "chtSmoke";
-            series1.ChartArea = "chaSmoke";
-            series1.IsVisibleInLegend = false;
-            series1.IsXValueIndexed = true;
-            series1.Name = "Smoke";
-            series1.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
-            this.chtSmoke.Series.Add(series1);
+            series5.ChartArea = "chaSmoke";
+            series5.IsVisibleInLegend = false;
+            series5.IsXValueIndexed = true;
+            series5.Name = "Smoke";
+            series5.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
+            this.chtSmoke.Series.Add(series5);
             this.chtSmoke.Size = new System.Drawing.Size(525, 148);
             this.chtSmoke.TabIndex = 59;
-            title1.Name = "Smoke";
-            title1.Text = "Smoke Sensors";
-            this.chtSmoke.Titles.Add(title1);
+            title5.Name = "Smoke";
+            title5.Text = "Smoke Sensors";
+            this.chtSmoke.Titles.Add(title5);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(864, 9);
+            this.label1.Location = new System.Drawing.Point(1138, 10);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(79, 17);
@@ -2167,7 +2168,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(864, 48);
+            this.label2.Location = new System.Drawing.Point(1126, 43);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(91, 17);
@@ -2177,7 +2178,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(864, 87);
+            this.label3.Location = new System.Drawing.Point(1105, 75);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(112, 17);
@@ -2186,22 +2187,22 @@
             // 
             // chtTemperature
             // 
-            chartArea2.Name = "chaSmoke";
-            this.chtTemperature.ChartAreas.Add(chartArea2);
+            chartArea6.Name = "chaSmoke";
+            this.chtTemperature.ChartAreas.Add(chartArea6);
             this.chtTemperature.Location = new System.Drawing.Point(551, 597);
             this.chtTemperature.Margin = new System.Windows.Forms.Padding(4);
             this.chtTemperature.Name = "chtTemperature";
-            series2.ChartArea = "chaSmoke";
-            series2.IsVisibleInLegend = false;
-            series2.IsXValueIndexed = true;
-            series2.Name = "Smoke";
-            series2.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
-            this.chtTemperature.Series.Add(series2);
+            series6.ChartArea = "chaSmoke";
+            series6.IsVisibleInLegend = false;
+            series6.IsXValueIndexed = true;
+            series6.Name = "Smoke";
+            series6.XValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
+            this.chtTemperature.Series.Add(series6);
             this.chtTemperature.Size = new System.Drawing.Size(613, 148);
             this.chtTemperature.TabIndex = 63;
-            title2.Name = "Temperature";
-            title2.Text = "Temperature Sensors";
-            this.chtTemperature.Titles.Add(title2);
+            title6.Name = "Temperature";
+            title6.Text = "Temperature Sensors";
+            this.chtTemperature.Titles.Add(title6);
             // 
             // chkSmoke
             // 
@@ -2265,11 +2266,27 @@
             this.label5.TabIndex = 68;
             this.label5.Text = "Active Temp Sensors";
             // 
+            // labelCount
+            // 
+            this.labelCount.AutoSize = true;
+            this.labelCount.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.labelCount.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.labelCount.Font = new System.Drawing.Font("Consolas", 19.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelCount.ForeColor = System.Drawing.Color.Lime;
+            this.labelCount.Location = new System.Drawing.Point(802, 29);
+            this.labelCount.MinimumSize = new System.Drawing.Size(171, 50);
+            this.labelCount.Name = "labelCount";
+            this.labelCount.Size = new System.Drawing.Size(171, 50);
+            this.labelCount.TabIndex = 69;
+            this.labelCount.Text = "00:00";
+            this.labelCount.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1239, 750);
+            this.Controls.Add(this.labelCount);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.chkTemp);
@@ -2506,6 +2523,7 @@
         private System.Windows.Forms.CheckedListBox chkTemp;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label labelCount;
     }
 }
 

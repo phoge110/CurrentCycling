@@ -70,6 +70,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArduinoMachine.cs" />
     <Compile Include="SerialPortClass.cs" />
     <Compile Include="CurrentCycling.cs" />
     <Compile Include="TDK.cs" />
