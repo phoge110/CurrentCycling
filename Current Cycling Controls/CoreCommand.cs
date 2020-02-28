@@ -12,11 +12,11 @@ namespace Current_Cycling_Controls {
         public U.CmdType Type { get; set; }
         public List<TDK> TDK { get; set; }
         public StartCyclingArgs StartArgs { get; set; }
+        public RecievePacket ArduinoArgs { get; set; }
 
         public static CoreCommand StartCycling(U.CmdType op) {
             return new CoreCommand {
                 Type = U.CmdType.Sequence,
-                //TDK = 
             };
 
         }

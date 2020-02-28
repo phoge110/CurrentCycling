@@ -17,7 +17,8 @@ namespace Current_Cycling_Controls {
             StartCycling,
             UpdateUI,
             StopCycling,
-            CleanGUI
+            CleanGUI,
+            RecievedPacket
         }
 
         public enum Status {

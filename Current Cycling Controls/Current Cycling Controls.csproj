@@ -71,7 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArduinoMachine.cs" />
-    <Compile Include="SerialPortClass.cs" />
+    <Compile Include="ArduinoUpdates.cs" />
     <Compile Include="CurrentCycling.cs" />
     <Compile Include="TDK.cs" />
     <Compile Include="StartCyclingArgs.cs" />

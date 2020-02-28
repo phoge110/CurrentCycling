@@ -27,6 +27,8 @@ namespace Current_Cycling_Controls
         private List<CheckBox> _checkBoxes;
         private List<TextBox> _tempSensors;
         private List<TextBox> _setCurrents;
+        private List<Label> _tempLabels;
+        private List<Label> _smokeLabels;
         private DateTime _cycleTimer = DateTime.Now;
         public frmMain()
         {
@@ -42,9 +44,11 @@ namespace Current_Cycling_Controls
             _TDKWorker.RunWorkerCompleted += CyclingComplete;
 
             _arduinoWorker.DoWork += RunArduinoLoop;
-
+            _arduinoWorker.RunWorkerAsync();
 
             _cycling.NewCoreCommand += NewCoreCommand;
+            _arduino.NewCoreCommand += NewCoreCommand;
+
 
             _checkBoxes = new List<CheckBox> { chkbxPort1 , chkbxPort2, chkbxPort3,
             chkbxPort4, chkbxPort5, chkbxPort6, chkbxPort7, chkbxPort8, chkbxPort9,
@@ -56,6 +60,13 @@ namespace Current_Cycling_Controls
             txtTempSensSample3,txtTempSensSample4,txtTempSensSample5,txtTempSensSample6,
             txtTempSensSample7,txtTempSensSample8,txtTempSensSample9,
             txtTempSensSample10,txtTempSensSample11,txtTempSensSample12};
+            _tempLabels = new List<Label> { labelTemp1, labelTemp2,
+            labelTemp3,labelTemp4,labelTemp5,labelTemp6,
+            labelTemp7,labelTemp8,labelTemp9,labelTemp10,
+            labelTemp11,labelTemp12, labelTemp13, labelTemp14, labelTemp15, labelTemp16};
+            _smokeLabels = new List<Label> { labelSmoke1, labelSmoke2,
+            labelSmoke3,labelSmoke4,labelSmoke5,labelSmoke6,
+            labelSmoke7,labelSmoke8};
 
             _TDKS = new List<TDK> { };
             for (int i = 1; i <13; i++) {
@@ -79,7 +90,6 @@ namespace Current_Cycling_Controls
         }
 
         private void RunArduinoLoop(object s, DoWorkEventArgs e) {
-            var tdk = (StartCyclingArgs)e.Argument;
             _arduino.StartArduinoMachine();
         }
 
@@ -144,6 +154,18 @@ namespace Current_Cycling_Controls
                 case U.CmdType.CleanGUI:
                     _commWorker.ReportProgress(1);
                     break;
+                case U.CmdType.RecievedPacket:
+                    // update GUI with temp/smoke/alarms
+                    _commWorker.ReportProgress(2, c.ArduinoArgs); 
+
+                    // if cycling is running then update alarms if needed
+                    if (_TDKWorker.IsBusy) {
+                        var packet = _arduino._recievedPacket;
+                        _cycling.SMOKEALARM = packet.SmokeAlarm;
+                        _cycling.TEMPALARM = packet.TempAlarm;
+                        _cycling.STOP = packet.EMSSTOP;
+                    }
+                    break;
             }
         }
         // TODO: AUTORESET EVENT FOR ARDUNIO RESEARCH
@@ -185,6 +207,25 @@ namespace Current_Cycling_Controls
                     }
                     btnStart.Enabled = true;
                     return;
+                }
+                // update temp/smoke/alarm readings
+                else if (e.ProgressPercentage == 2) {
+                    var ardArgs = _arduino._recievedPacket;
+                    var i = 0;
+                    foreach (var lb in _tempLabels) {
+                        lb.Text = ardArgs.TempList[i].ToString("F2");
+                        i++;
+                    }
+                    i = 0;
+                    foreach (var lb in _smokeLabels) {
+                        lb.Text = ardArgs.SmokeList[i].ToString("F2");
+                        i++;
+                    }
+
+                    labelTempAlarm.BackColor = ardArgs.TempAlarm ? Color.Red : Color.Empty;
+                    labelSmokeAlarm.BackColor = ardArgs.SmokeAlarm ? Color.Red : Color.Empty;
+                    labelEMSStop.BackColor = ardArgs.EMSSTOP ? Color.Red : Color.Empty;
+
                 }
             }
             catch { }

@@ -20,10 +20,13 @@ namespace Current_Cycling_Controls {
         public bool _updateRun;
         public GUIArgs _args;
         public bool STOP;
+        public bool SMOKEALARM;
+        public bool TEMPALARM;
         public event CoreCommandEvent NewCoreCommand;
         public CurrentCycling() {
             // initialize
             _serTDK = new SerialPort();
+            OpenPorts();
         }
 
 
@@ -31,7 +34,6 @@ namespace Current_Cycling_Controls {
             // start serial interface stuff/ start timers
             var tdk = args.TDK;
             try {
-                OpenPorts(); // TODO: MOVE TO FRMMAIN()
                 foreach (var t in tdk) {
                     try {
                         SetAddress(t);
@@ -46,13 +48,14 @@ namespace Current_Cycling_Controls {
 
                 // Loop forever until we get a stop command from main thread
                 while (true) {
+                    // BIAS ON
                     foreach (var t in tdk) {
                         TurnON(t);
                     }
-                    StartTimer();
-                    // BIAS ON
+                    StartTimer();                    
                     _cycleTimer = DateTime.Now.AddMilliseconds(args.BiasOnTime);
-                    while (_timer.ElapsedMilliseconds < args.BiasOnTime && !STOP) {
+                    while (_timer.ElapsedMilliseconds < args.BiasOnTime
+                        && !STOP && !TEMPALARM && !SMOKEALARM) {
                         foreach (var tt in tdk) {
                             SetAddress(tt);
 
@@ -67,12 +70,13 @@ namespace Current_Cycling_Controls {
                             NewCoreCommand?.Invoke(this, new CoreCommand() { Type = U.CmdType.UpdateUI });
                         }
                     }
-                    if (STOP) break;
+                    if (STOP || SMOKEALARM || TEMPALARM) break;
                     // BIAS OFF
                     TurnOff(tdk);
                     StartTimer();
                     _cycleTimer = DateTime.Now.AddMilliseconds(args.BiasOffTime);
-                    while (_timer.ElapsedMilliseconds < args.BiasOffTime && !STOP) {
+                    while (_timer.ElapsedMilliseconds < args.BiasOffTime
+                        && !STOP && !TEMPALARM && !SMOKEALARM) {
                         foreach (var tt in tdk) {
                             _serTDK.Write("MV?\r\n");
                             Wait(50); // lag in measured value
@@ -85,7 +89,7 @@ namespace Current_Cycling_Controls {
                             NewCoreCommand?.Invoke(this, new CoreCommand() { Type = U.CmdType.UpdateUI });
                         }
                     }
-                    if (STOP) break;
+                    if (STOP || SMOKEALARM || TEMPALARM) break;
 
                     // completed a bias on/off cycle
                     foreach (var ttt in tdk) {
@@ -98,9 +102,12 @@ namespace Current_Cycling_Controls {
                 Console.WriteLine($"{exc}");
                 TurnOffClose(tdk);
                 STOP = false;
+                SMOKEALARM = false;
+                TEMPALARM = false;
             }
-
             STOP = false;
+            SMOKEALARM = false;
+            TEMPALARM = false;
             TurnOffClose(tdk);
         }
 
@@ -135,9 +142,6 @@ namespace Current_Cycling_Controls {
                 }
                 catch { }
             }
-
-
-            
         }
 
         private void SetAddress(TDK tdk) {
