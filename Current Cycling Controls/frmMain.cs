@@ -11,9 +11,11 @@ using System.Windows.Forms;
 
 namespace Current_Cycling_Controls
 {
+    public delegate void HeartBeatUpdate(object sender, TransmitPacket t);
     public partial class frmMain : Form
     {
         public bool Connected { get; set; }
+        public HeartBeatUpdate heartBeatUpdates;
         private readonly AutoResetEvent _commReset = new AutoResetEvent(false);
         private BackgroundWorker _commWorker = new BackgroundWorker();
         private BackgroundWorker _TDKWorker = new BackgroundWorker();
@@ -21,7 +23,6 @@ namespace Current_Cycling_Controls
         private readonly Queue<CoreCommand> _commandQueue = new Queue<CoreCommand>();
         private CurrentCycling _cycling = new CurrentCycling();
         private ArduinoMachine _arduino = new ArduinoMachine();
-        private int _count;
         private readonly object _lock = new object();
         private List<TDK> _TDKS;
         private List<CheckBox> _checkBoxes;
@@ -30,6 +31,7 @@ namespace Current_Cycling_Controls
         private List<Label> _tempLabels;
         private List<Label> _smokeLabels;
         private DateTime _cycleTimer = DateTime.Now;
+        private TransmitPacket _heartBeatPacket;
         public frmMain()
         {
             InitializeComponent();
@@ -44,6 +46,8 @@ namespace Current_Cycling_Controls
             _TDKWorker.RunWorkerCompleted += CyclingComplete;
 
             _arduinoWorker.DoWork += RunArduinoLoop;
+            _arduinoWorker.WorkerReportsProgress = true;
+            _arduinoWorker.ProgressChanged += UpdateHeartBeat;
             _arduinoWorker.RunWorkerAsync();
 
             _cycling.NewCoreCommand += NewCoreCommand;
@@ -68,11 +72,23 @@ namespace Current_Cycling_Controls
             labelSmoke3,labelSmoke4,labelSmoke5,labelSmoke6,
             labelSmoke7,labelSmoke8};
 
+            // initialize TDK objects
             _TDKS = new List<TDK> { };
             for (int i = 1; i <13; i++) {
                 _TDKS.Add(new TDK("0" + i, i));
             }
 
+            // initialize heartbeatpacket before arduino declarations
+            string tempBin = "";
+            foreach (CheckBox chk in chkTemp.CheckedItems) {
+                tempBin += getbinary(chk.Checked);
+            }
+            string smokeBin = "";
+            foreach (CheckBox chk in chkSmoke.CheckedItems) {
+                smokeBin += getbinary(chk.Checked);
+            }
+            _heartBeatPacket = new TransmitPacket(txtOverTempSet.Text, textSmokeOverSet.Text,
+                txtCurrOnTempSet.Text, txtCurrOffTempSet.Text, "", tempBin, smokeBin);
 
         }
 
@@ -91,6 +107,10 @@ namespace Current_Cycling_Controls
 
         private void RunArduinoLoop(object s, DoWorkEventArgs e) {
             _arduino.StartArduinoMachine();
+        }
+
+        public void UpdateHeartBeat(object sender, ProgressChangedEventArgs e) {
+            _arduino.UpdateTransmit(_heartBeatPacket);
         }
 
 
@@ -142,6 +162,8 @@ namespace Current_Cycling_Controls
                     break;
                 case U.CmdType.StartCycling:
                     Console.WriteLine($"Starting TDK Worker thread");
+                    NewCoreCommand(this, new CoreCommand { Type = U.CmdType.UpdateHeartBeatPacket });
+                    
                     _TDKWorker.RunWorkerAsync(c.StartArgs);
                     // communicate with TDKs with the StartInspectionProperties
                     break;
@@ -166,6 +188,10 @@ namespace Current_Cycling_Controls
                         _cycling.STOP = packet.EMSSTOP;
                     }
                     break;
+                case U.CmdType.UpdateHeartBeatPacket:
+                    _commWorker.ReportProgress(3);
+                    break;
+
             }
         }
         // TODO: AUTORESET EVENT FOR ARDUNIO RESEARCH
@@ -179,7 +205,6 @@ namespace Current_Cycling_Controls
 
         private void UpdateUi(object sender, ProgressChangedEventArgs e) {
             try {
-                _count = 0;
                 // update TDK readings
                 if (e.ProgressPercentage == 5) {
                     var args = _cycling._args;
@@ -227,6 +252,23 @@ namespace Current_Cycling_Controls
                     labelEMSStop.BackColor = ardArgs.EMSSTOP ? Color.Red : Color.Empty;
 
                 }
+                // send event to arduino thread to update serial transmit packet
+                else if (e.ProgressPercentage == 3){
+                    string tempBin = "";
+                    foreach (object chk in chkTemp.Items) {
+                        tempBin += getbinary(chkTemp.GetItemChecked(chkTemp.Items.IndexOf(chk)));
+                    }
+                    string smokeBin = "";
+                    foreach (object chk in chkSmoke.Items) {
+                        smokeBin += getbinary(chkTemp.GetItemChecked(chkTemp.Items.IndexOf(chk)));
+                    }
+
+                    _heartBeatPacket = new TransmitPacket(txtOverTempSet.Text, textSmokeOverSet.Text,
+                        txtCurrOnTempSet.Text, txtCurrOffTempSet.Text, "", tempBin, smokeBin);
+                    _arduinoWorker.ReportProgress(1);
+                    //heartBeatUpdates.Invoke(this, new TransmitPacket(txtOverTempSet.Text, textSmokeOverSet.Text,
+                    //    txtCurrOnTempSet.Text, txtCurrOffTempSet.Text, "", tempBin, smokeBin));
+                }
             }
             catch { }
         }
@@ -257,6 +299,8 @@ namespace Current_Cycling_Controls
             foreach (var curr in _setCurrents) {
                 curr.Enabled = false;
             }
+            chkTemp.Enabled = false;
+            chkSmoke.Enabled = false;
             btnStart.Enabled = false;
 
 
@@ -315,6 +359,10 @@ namespace Current_Cycling_Controls
             }
         }
 
+        private string getbinary(bool value) {
+            return (value == true ? "1" : "0");
+        }
+
 
 
         private void ChkbxPort1_CheckedChanged(object sender, EventArgs e) {
@@ -324,5 +372,6 @@ namespace Current_Cycling_Controls
         private void BtnStop_Click(object sender, EventArgs e) {
             NewCoreCommand(this, new CoreCommand{ Type = U.CmdType.StopCycling });
         }
+
     }
 }

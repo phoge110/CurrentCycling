@@ -9,7 +9,6 @@ using System.ComponentModel;
 namespace Current_Cycling_Controls {
     public delegate void ArduinoEvent(object sender, GUIArgs e);
     public class ArduinoMachine {
-
         private SerialPort _serArduino;
         private BackgroundWorker _readThread = new BackgroundWorker();
         private readonly Queue<CoreCommand> _commandQueue = new Queue<CoreCommand>();
@@ -17,9 +16,9 @@ namespace Current_Cycling_Controls {
         private readonly object _lock = new object();
         public RecievePacket _recievedPacket;
         public event CoreCommandEvent NewCoreCommand;
-
+        public TransmitPacket _transmitPacket;
         public ArduinoMachine() {
-            
+            _transmitPacket = new TransmitPacket("200", "200", "85", "25", "", "0000000000000000", "00000000");
         }
 
         public void StartArduinoMachine() {
@@ -37,11 +36,16 @@ namespace Current_Cycling_Controls {
                     else if (ex is InvalidPacketSize) {
                         Console.WriteLine(ex);
                     }
+                    else {
+                        Console.WriteLine($"{ex}");
+                    }
                 }
 
-                // send heartbeat? what if the GUI controls change?
+                SendPackets();
             }
         }
+
+        
 
         private void OpenPorts() {
             string[] ports = SerialPort.GetPortNames();
@@ -79,6 +83,13 @@ namespace Current_Cycling_Controls {
             _recievedPacket = ParsePacket(packet);
         }
 
+        private void SendPackets() {
+            _serArduino.WriteLine(_transmitPacket.ToCommaString());
+
+
+
+        }
+
 
         private RecievePacket ParsePacket(string packet) {
             var values = packet.Split(',').Select(sValue => sValue.Trim()).ToList();
@@ -87,6 +98,10 @@ namespace Current_Cycling_Controls {
             }
             return new RecievePacket(values.Take(16).ToList(), values.Skip(16).Take(8).ToList(),
                 values[24], values[25], values[26], values[27]);
+        }
+
+        public void UpdateTransmit(TransmitPacket t) {
+            _transmitPacket = t;
         }
 
 
@@ -119,11 +134,26 @@ namespace Current_Cycling_Controls {
         private string BiasCurrentONTemp { get; set; }
         private string BiasCurrentOFFTemp { get; set; }
         private string BiasCurrentStatus { get; set; }
-        // TODO: Decide on the active smoke/temp packet structure that the arduino wants
+        private string ActiveTemps { get; set; }
+        private string ActiveSmokes { get; set; }
             
-        public TransmitPacket() {
+        public TransmitPacket(string setTemp, string setSmoke, string biasONTemp,
+            string biasOFFTemp, string currentStatus, string activetemps, string activesmokes) {
+            TempSetPoint = setTemp;
+            SmokeSetPoint = setSmoke;
+            BiasCurrentONTemp = biasONTemp;
+            BiasCurrentOFFTemp = biasOFFTemp;
+            //BiasCurrentStatus = "";
 
+            ActiveTemps = activetemps;
+            ActiveSmokes = activesmokes;
 
+        }
+
+        public string ToCommaString() {
+            string[] str = { TempSetPoint, SmokeSetPoint, BiasCurrentONTemp, BiasCurrentOFFTemp,
+                ActiveTemps, ActiveSmokes};
+            return string.Join(",", str);
         }
 
     }

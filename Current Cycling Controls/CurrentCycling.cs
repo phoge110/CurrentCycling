@@ -26,7 +26,7 @@ namespace Current_Cycling_Controls {
         public CurrentCycling() {
             // initialize
             _serTDK = new SerialPort();
-            OpenPorts();
+            //OpenPorts();
         }
 
 

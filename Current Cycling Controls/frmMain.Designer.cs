@@ -247,12 +247,14 @@
             this.labelSmoke2 = new System.Windows.Forms.Label();
             this.labelSmoke1 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.textSmokeOverSet = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnSamplesList
             // 
-            this.btnSamplesList.Location = new System.Drawing.Point(588, 108);
+            this.btnSamplesList.Location = new System.Drawing.Point(377, 114);
             this.btnSamplesList.Margin = new System.Windows.Forms.Padding(4);
             this.btnSamplesList.Name = "btnSamplesList";
             this.btnSamplesList.Size = new System.Drawing.Size(100, 28);
@@ -1955,7 +1957,7 @@
             // 
             // btnChoosePath
             // 
-            this.btnChoosePath.Location = new System.Drawing.Point(469, 111);
+            this.btnChoosePath.Location = new System.Drawing.Point(261, 114);
             this.btnChoosePath.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnChoosePath.Name = "btnChoosePath";
             this.btnChoosePath.Size = new System.Drawing.Size(109, 25);
@@ -1965,7 +1967,7 @@
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(384, 75);
+            this.btnExit.Location = new System.Drawing.Point(356, 75);
             this.btnExit.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(69, 28);
@@ -1997,7 +1999,7 @@
             // 
             // btnConnect
             // 
-            this.btnConnect.Location = new System.Drawing.Point(289, 75);
+            this.btnConnect.Location = new System.Drawing.Point(261, 75);
             this.btnConnect.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnConnect.Name = "btnConnect";
             this.btnConnect.Size = new System.Drawing.Size(89, 28);
@@ -2010,7 +2012,7 @@
             this.txtDirectory.Location = new System.Drawing.Point(96, 111);
             this.txtDirectory.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtDirectory.Name = "txtDirectory";
-            this.txtDirectory.Size = new System.Drawing.Size(311, 22);
+            this.txtDirectory.Size = new System.Drawing.Size(153, 22);
             this.txtDirectory.TabIndex = 51;
             this.txtDirectory.Text = "C:\\Users\\khan\\Documents\\CC cabinet\\Data\\";
             // 
@@ -2124,7 +2126,7 @@
             // 
             // txtBiasOff
             // 
-            this.txtBiasOff.Location = new System.Drawing.Point(417, 43);
+            this.txtBiasOff.Location = new System.Drawing.Point(390, 42);
             this.txtBiasOff.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtBiasOff.Name = "txtBiasOff";
             this.txtBiasOff.Size = new System.Drawing.Size(35, 22);
@@ -2133,7 +2135,7 @@
             // 
             // txtBiasOn
             // 
-            this.txtBiasOn.Location = new System.Drawing.Point(417, 5);
+            this.txtBiasOn.Location = new System.Drawing.Point(390, 5);
             this.txtBiasOn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtBiasOn.Name = "txtBiasOn";
             this.txtBiasOn.Size = new System.Drawing.Size(35, 22);
@@ -2143,7 +2145,7 @@
             // lblBiasOff
             // 
             this.lblBiasOff.AutoSize = true;
-            this.lblBiasOff.Location = new System.Drawing.Point(285, 43);
+            this.lblBiasOff.Location = new System.Drawing.Point(258, 42);
             this.lblBiasOff.Name = "lblBiasOff";
             this.lblBiasOff.Size = new System.Drawing.Size(125, 17);
             this.lblBiasOff.TabIndex = 34;
@@ -2152,7 +2154,7 @@
             // lblBiasOn
             // 
             this.lblBiasOn.AutoSize = true;
-            this.lblBiasOn.Location = new System.Drawing.Point(285, 9);
+            this.lblBiasOn.Location = new System.Drawing.Point(258, 9);
             this.lblBiasOn.Name = "lblBiasOn";
             this.lblBiasOn.Size = new System.Drawing.Size(125, 17);
             this.lblBiasOn.TabIndex = 33;
@@ -2585,11 +2587,31 @@
             this.label16.TabIndex = 147;
             this.label16.Text = "Smoke Readings";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(484, 118);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(147, 17);
+            this.label1.TabIndex = 158;
+            this.label1.Text = "Over-Smoke Setpoint:";
+            // 
+            // textSmokeOverSet
+            // 
+            this.textSmokeOverSet.Location = new System.Drawing.Point(696, 115);
+            this.textSmokeOverSet.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.textSmokeOverSet.Name = "textSmokeOverSet";
+            this.textSmokeOverSet.Size = new System.Drawing.Size(35, 22);
+            this.textSmokeOverSet.TabIndex = 159;
+            this.textSmokeOverSet.Text = "200";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1239, 750);
+            this.Controls.Add(this.textSmokeOverSet);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.labelSmoke7);
@@ -2886,6 +2908,8 @@
         private System.Windows.Forms.Label labelSmoke2;
         private System.Windows.Forms.Label labelSmoke1;
         private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox textSmokeOverSet;
     }
 }
 
