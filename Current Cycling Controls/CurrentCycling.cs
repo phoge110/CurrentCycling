@@ -22,11 +22,12 @@ namespace Current_Cycling_Controls {
         public bool STOP;
         public bool SMOKEALARM;
         public bool TEMPALARM;
+        public bool BIASON;
         public event CoreCommandEvent NewCoreCommand;
         public CurrentCycling() {
             // initialize
             _serTDK = new SerialPort();
-            //OpenPorts();
+            OpenPorts();
         }
 
 
@@ -38,12 +39,12 @@ namespace Current_Cycling_Controls {
                     try {
                         SetAddress(t);
                         SetCurrentVoltage(t);
+                        t.Connected = true;
                     }
                     catch (TimeoutException exc) {
                         Console.WriteLine($"TIMEOUT ON PORT #{t.Port}");
                         throw new Exception(exc.Message);
                     }
-                    
                 }
 
                 // Loop forever until we get a stop command from main thread
@@ -52,6 +53,8 @@ namespace Current_Cycling_Controls {
                     foreach (var t in tdk) {
                         TurnON(t);
                     }
+                    BIASON = true;
+                    NewCoreCommand?.Invoke(this, new CoreCommand() { Type = U.CmdType.UpdateHeartBeatPacket });
                     StartTimer();                    
                     _cycleTimer = DateTime.Now.AddMilliseconds(args.BiasOnTime);
                     while (_timer.ElapsedMilliseconds < args.BiasOnTime
@@ -73,6 +76,8 @@ namespace Current_Cycling_Controls {
                     if (STOP || SMOKEALARM || TEMPALARM) break;
                     // BIAS OFF
                     TurnOff(tdk);
+                    BIASON = false;
+                    NewCoreCommand?.Invoke(this, new CoreCommand() { Type = U.CmdType.UpdateHeartBeatPacket });
                     StartTimer();
                     _cycleTimer = DateTime.Now.AddMilliseconds(args.BiasOffTime);
                     while (_timer.ElapsedMilliseconds < args.BiasOffTime
@@ -201,12 +206,27 @@ namespace Current_Cycling_Controls {
                 _serTDK.Write("ADR " + t.Address + "\r\n");
                 _serTDK.Write("OUT OFF\r\n");
                 if (_serTDK.ReadLine() == "OK") {
-                    Console.WriteLine($"OFF: OKAY");
+                    Console.WriteLine($"Port #{t.Port} OFF: OKAY");
                 }
                 _serTDK.DiscardOutBuffer();
                 _serTDK.DiscardInBuffer();
-                _serTDK.Close();
+                
+                
             }
+            StartTimer();
+            Wait(500);
+            foreach (var tt in tdk) {
+                _serTDK.Write("MV?\r\n");
+                Wait(50); // lag in measured value
+                string volt = _serTDK.ReadLine();
+
+                _serTDK.Write("MC?\r\n");
+                Wait(50);
+                string current = _serTDK.ReadLine();
+                _args = new GUIArgs(volt, current, tt.CycleCount, tt.Port, _cycleTimer);
+                NewCoreCommand?.Invoke(this, new CoreCommand() { Type = U.CmdType.UpdateUI });
+            }
+            //_serTDK.Close();
         }
 
         private void StartTimer() {
@@ -216,7 +236,7 @@ namespace Current_Cycling_Controls {
 
         private void Wait(int t) {
             long elapsed = _timer.ElapsedMilliseconds;
-            while (_timer.ElapsedMilliseconds - elapsed > t) { }
+            while (_timer.ElapsedMilliseconds - elapsed < t) { }
         }
 
         public void Timeout(Object source, ElapsedEventArgs e) {

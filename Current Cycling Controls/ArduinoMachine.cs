@@ -18,7 +18,7 @@ namespace Current_Cycling_Controls {
         public event CoreCommandEvent NewCoreCommand;
         public TransmitPacket _transmitPacket;
         public ArduinoMachine() {
-            _transmitPacket = new TransmitPacket("200", "200", "85", "25", "", "0000000000000000", "00000000");
+            _transmitPacket = new TransmitPacket("200", "200", "85", "25", "0", "0000000000000000", "00000000");
         }
 
         public void StartArduinoMachine() {
@@ -49,10 +49,10 @@ namespace Current_Cycling_Controls {
 
         private void OpenPorts() {
             string[] ports = SerialPort.GetPortNames();
-            _serArduino.BaudRate = 9600;
-            _serArduino.PortName = "COM4";
+            _serArduino.BaudRate = 115200;
+            _serArduino.PortName = "COM6";
             _serArduino.NewLine = "\r";
-            _serArduino.ReadTimeout = 1000;
+            _serArduino.ReadTimeout = 2000;
             _serArduino.Open();
             //foreach (var port in ports) { // ping each port and see if we get the correct response
             //    try {
@@ -143,7 +143,7 @@ namespace Current_Cycling_Controls {
             SmokeSetPoint = setSmoke;
             BiasCurrentONTemp = biasONTemp;
             BiasCurrentOFFTemp = biasOFFTemp;
-            //BiasCurrentStatus = "";
+            BiasCurrentStatus = currentStatus;
 
             ActiveTemps = activetemps;
             ActiveSmokes = activesmokes;

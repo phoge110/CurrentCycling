@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Current_Cycling_Controls {
     public class TDK {
-        public bool ON { get; set; }
+        public bool Connected { get; set; }
         public int Port { get; set; }
         public string Address { get; set; }
         public string Current { get; set; }

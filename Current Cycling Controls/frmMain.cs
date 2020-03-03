@@ -80,15 +80,15 @@ namespace Current_Cycling_Controls
 
             // initialize heartbeatpacket before arduino declarations
             string tempBin = "";
-            foreach (CheckBox chk in chkTemp.CheckedItems) {
-                tempBin += getbinary(chk.Checked);
+            foreach (object chk in chkTemp.Items) {
+                tempBin += getbinary(chkTemp.GetItemChecked(chkTemp.Items.IndexOf(chk)));
             }
             string smokeBin = "";
-            foreach (CheckBox chk in chkSmoke.CheckedItems) {
-                smokeBin += getbinary(chk.Checked);
+            foreach (object chk in chkSmoke.Items) {
+                smokeBin += getbinary(chkTemp.GetItemChecked(chkTemp.Items.IndexOf(chk)));
             }
             _heartBeatPacket = new TransmitPacket(txtOverTempSet.Text, textSmokeOverSet.Text,
-                txtCurrOnTempSet.Text, txtCurrOffTempSet.Text, "", tempBin, smokeBin);
+                txtCurrOnTempSet.Text, txtCurrOffTempSet.Text, "0", tempBin, smokeBin);
 
         }
 
@@ -231,6 +231,8 @@ namespace Current_Cycling_Controls
                         curr.Enabled = true;
                     }
                     btnStart.Enabled = true;
+                    chkTemp.Enabled = true;
+                    chkSmoke.Enabled = true;
                     return;
                 }
                 // update temp/smoke/alarm readings
@@ -260,11 +262,11 @@ namespace Current_Cycling_Controls
                     }
                     string smokeBin = "";
                     foreach (object chk in chkSmoke.Items) {
-                        smokeBin += getbinary(chkTemp.GetItemChecked(chkTemp.Items.IndexOf(chk)));
+                        smokeBin += getbinary(chkSmoke.GetItemChecked(chkSmoke.Items.IndexOf(chk)));
                     }
-
+                    string biasON = _cycling.BIASON ? "1" : "0";
                     _heartBeatPacket = new TransmitPacket(txtOverTempSet.Text, textSmokeOverSet.Text,
-                        txtCurrOnTempSet.Text, txtCurrOffTempSet.Text, "", tempBin, smokeBin);
+                        txtCurrOnTempSet.Text, txtCurrOffTempSet.Text, biasON, tempBin, smokeBin);
                     _arduinoWorker.ReportProgress(1);
                     //heartBeatUpdates.Invoke(this, new TransmitPacket(txtOverTempSet.Text, textSmokeOverSet.Text,
                     //    txtCurrOnTempSet.Text, txtCurrOffTempSet.Text, "", tempBin, smokeBin));
