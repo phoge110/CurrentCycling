@@ -59,5 +59,14 @@ namespace Current_Cycling_Controls.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream AircraftAlarm {
+            get {
+                return ResourceManager.GetStream("AircraftAlarm", resourceCulture);
+            }
+        }
     }
 }

@@ -27,7 +27,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnSamplesList = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.txtSetCurr12 = new System.Windows.Forms.TextBox();
             this.txtSetCurr11 = new System.Windows.Forms.TextBox();
@@ -185,11 +184,8 @@
             this.txtTempSensSample10 = new System.Windows.Forms.TextBox();
             this.txtTempSensSample11 = new System.Windows.Forms.TextBox();
             this.txtTempSensSample12 = new System.Windows.Forms.TextBox();
-            this.btnChoosePath = new System.Windows.Forms.Button();
-            this.btnExit = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.btnStart = new System.Windows.Forms.Button();
-            this.btnConnect = new System.Windows.Forms.Button();
             this.txtDirectory = new System.Windows.Forms.TextBox();
             this.txtOperator = new System.Windows.Forms.TextBox();
             this.lblDirectory = new System.Windows.Forms.Label();
@@ -248,19 +244,13 @@
             this.labelSmoke1 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.textSmokeOverSet = new System.Windows.Forms.TextBox();
+            this.txtSmokeOverSet = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.txtPauseFans = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.buttonCheckConnection = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // btnSamplesList
-            // 
-            this.btnSamplesList.Location = new System.Drawing.Point(377, 114);
-            this.btnSamplesList.Margin = new System.Windows.Forms.Padding(4);
-            this.btnSamplesList.Name = "btnSamplesList";
-            this.btnSamplesList.Size = new System.Drawing.Size(100, 28);
-            this.btnSamplesList.TabIndex = 58;
-            this.btnSamplesList.Text = "Samples List";
-            this.btnSamplesList.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel1
             // 
@@ -581,6 +571,7 @@
             this.btnNew1.TabIndex = 61;
             this.btnNew1.Text = "New";
             this.btnNew1.UseVisualStyleBackColor = true;
+            this.btnNew1.Click += new System.EventHandler(this.BtnNew1_Click);
             // 
             // lblSetCurrent
             // 
@@ -940,6 +931,7 @@
             this.btnLoad1.TabIndex = 49;
             this.btnLoad1.Text = "Load";
             this.btnLoad1.UseVisualStyleBackColor = true;
+            this.btnLoad1.Click += new System.EventHandler(this.BtnLoad1_Click);
             // 
             // btnLoad2
             // 
@@ -950,6 +942,7 @@
             this.btnLoad2.TabIndex = 50;
             this.btnLoad2.Text = "Load";
             this.btnLoad2.UseVisualStyleBackColor = true;
+            this.btnLoad2.Click += new System.EventHandler(this.BtnLoad2_Click);
             // 
             // btnLoad3
             // 
@@ -960,6 +953,7 @@
             this.btnLoad3.TabIndex = 51;
             this.btnLoad3.Text = "Load";
             this.btnLoad3.UseVisualStyleBackColor = true;
+            this.btnLoad3.Click += new System.EventHandler(this.BtnLoad3_Click);
             // 
             // btnLoad4
             // 
@@ -970,6 +964,7 @@
             this.btnLoad4.TabIndex = 52;
             this.btnLoad4.Text = "Load";
             this.btnLoad4.UseVisualStyleBackColor = true;
+            this.btnLoad4.Click += new System.EventHandler(this.BtnLoad4_Click);
             // 
             // btnLoad5
             // 
@@ -980,6 +975,7 @@
             this.btnLoad5.TabIndex = 53;
             this.btnLoad5.Text = "Load";
             this.btnLoad5.UseVisualStyleBackColor = true;
+            this.btnLoad5.Click += new System.EventHandler(this.BtnLoad5_Click);
             // 
             // btnLoad6
             // 
@@ -990,6 +986,7 @@
             this.btnLoad6.TabIndex = 54;
             this.btnLoad6.Text = "Load";
             this.btnLoad6.UseVisualStyleBackColor = true;
+            this.btnLoad6.Click += new System.EventHandler(this.BtnLoad6_Click);
             // 
             // btnLoad7
             // 
@@ -1000,6 +997,7 @@
             this.btnLoad7.TabIndex = 55;
             this.btnLoad7.Text = "Load";
             this.btnLoad7.UseVisualStyleBackColor = true;
+            this.btnLoad7.Click += new System.EventHandler(this.BtnLoad7_Click);
             // 
             // btnLoad8
             // 
@@ -1010,6 +1008,7 @@
             this.btnLoad8.TabIndex = 56;
             this.btnLoad8.Text = "Load";
             this.btnLoad8.UseVisualStyleBackColor = true;
+            this.btnLoad8.Click += new System.EventHandler(this.BtnLoad8_Click);
             // 
             // btnLoad9
             // 
@@ -1020,6 +1019,7 @@
             this.btnLoad9.TabIndex = 58;
             this.btnLoad9.Text = "Load";
             this.btnLoad9.UseVisualStyleBackColor = true;
+            this.btnLoad9.Click += new System.EventHandler(this.BtnLoad9_Click);
             // 
             // btnLoad10
             // 
@@ -1030,6 +1030,7 @@
             this.btnLoad10.TabIndex = 57;
             this.btnLoad10.Text = "Load";
             this.btnLoad10.UseVisualStyleBackColor = true;
+            this.btnLoad10.Click += new System.EventHandler(this.BtnLoad10_Click);
             // 
             // btnLoad11
             // 
@@ -1040,6 +1041,7 @@
             this.btnLoad11.TabIndex = 59;
             this.btnLoad11.Text = "Load";
             this.btnLoad11.UseVisualStyleBackColor = true;
+            this.btnLoad11.Click += new System.EventHandler(this.BtnLoad11_Click);
             // 
             // btnLoad12
             // 
@@ -1050,6 +1052,7 @@
             this.btnLoad12.TabIndex = 60;
             this.btnLoad12.Text = "Load";
             this.btnLoad12.UseVisualStyleBackColor = true;
+            this.btnLoad12.Click += new System.EventHandler(this.BtnLoad12_Click);
             // 
             // btnNew2
             // 
@@ -1060,6 +1063,7 @@
             this.btnNew2.TabIndex = 62;
             this.btnNew2.Text = "New";
             this.btnNew2.UseVisualStyleBackColor = true;
+            this.btnNew2.Click += new System.EventHandler(this.BtnNew2_Click);
             // 
             // btnNew3
             // 
@@ -1070,6 +1074,7 @@
             this.btnNew3.TabIndex = 63;
             this.btnNew3.Text = "New";
             this.btnNew3.UseVisualStyleBackColor = true;
+            this.btnNew3.Click += new System.EventHandler(this.BtnNew3_Click);
             // 
             // btnNew4
             // 
@@ -1080,6 +1085,7 @@
             this.btnNew4.TabIndex = 64;
             this.btnNew4.Text = "New";
             this.btnNew4.UseVisualStyleBackColor = true;
+            this.btnNew4.Click += new System.EventHandler(this.BtnNew4_Click);
             // 
             // btnNew5
             // 
@@ -1090,6 +1096,7 @@
             this.btnNew5.TabIndex = 65;
             this.btnNew5.Text = "New";
             this.btnNew5.UseVisualStyleBackColor = true;
+            this.btnNew5.Click += new System.EventHandler(this.BtnNew5_Click);
             // 
             // btnNew6
             // 
@@ -1100,6 +1107,7 @@
             this.btnNew6.TabIndex = 66;
             this.btnNew6.Text = "New";
             this.btnNew6.UseVisualStyleBackColor = true;
+            this.btnNew6.Click += new System.EventHandler(this.BtnNew6_Click);
             // 
             // btnNew7
             // 
@@ -1110,6 +1118,7 @@
             this.btnNew7.TabIndex = 68;
             this.btnNew7.Text = "New";
             this.btnNew7.UseVisualStyleBackColor = true;
+            this.btnNew7.Click += new System.EventHandler(this.BtnNew7_Click);
             // 
             // btnNew8
             // 
@@ -1120,6 +1129,7 @@
             this.btnNew8.TabIndex = 67;
             this.btnNew8.Text = "New";
             this.btnNew8.UseVisualStyleBackColor = true;
+            this.btnNew8.Click += new System.EventHandler(this.BtnNew8_Click);
             // 
             // btnNew9
             // 
@@ -1130,6 +1140,7 @@
             this.btnNew9.TabIndex = 69;
             this.btnNew9.Text = "New";
             this.btnNew9.UseVisualStyleBackColor = true;
+            this.btnNew9.Click += new System.EventHandler(this.BtnNew9_Click);
             // 
             // btnNew10
             // 
@@ -1140,6 +1151,7 @@
             this.btnNew10.TabIndex = 70;
             this.btnNew10.Text = "New";
             this.btnNew10.UseVisualStyleBackColor = true;
+            this.btnNew10.Click += new System.EventHandler(this.BtnNew10_Click);
             // 
             // btnNew11
             // 
@@ -1150,6 +1162,7 @@
             this.btnNew11.TabIndex = 71;
             this.btnNew11.Text = "New";
             this.btnNew11.UseVisualStyleBackColor = true;
+            this.btnNew11.Click += new System.EventHandler(this.BtnNew11_Click);
             // 
             // btnNew12
             // 
@@ -1160,6 +1173,7 @@
             this.btnNew12.TabIndex = 72;
             this.btnNew12.Text = "New";
             this.btnNew12.UseVisualStyleBackColor = true;
+            this.btnNew12.Click += new System.EventHandler(this.BtnNew12_Click);
             // 
             // txtNumCells1
             // 
@@ -1955,26 +1969,6 @@
             this.txtTempSensSample12.TabIndex = 155;
             this.txtTempSensSample12.Text = "12";
             // 
-            // btnChoosePath
-            // 
-            this.btnChoosePath.Location = new System.Drawing.Point(261, 114);
-            this.btnChoosePath.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.btnChoosePath.Name = "btnChoosePath";
-            this.btnChoosePath.Size = new System.Drawing.Size(109, 25);
-            this.btnChoosePath.TabIndex = 56;
-            this.btnChoosePath.Text = "Choose Path";
-            this.btnChoosePath.UseVisualStyleBackColor = true;
-            // 
-            // btnExit
-            // 
-            this.btnExit.Location = new System.Drawing.Point(356, 75);
-            this.btnExit.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(69, 28);
-            this.btnExit.TabIndex = 55;
-            this.btnExit.Text = "Exit";
-            this.btnExit.UseVisualStyleBackColor = true;
-            // 
             // btnStop
             // 
             this.btnStop.Location = new System.Drawing.Point(13, 42);
@@ -1996,16 +1990,6 @@
             this.btnStart.Text = "Start";
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.BtnStart_Click);
-            // 
-            // btnConnect
-            // 
-            this.btnConnect.Location = new System.Drawing.Point(261, 75);
-            this.btnConnect.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(89, 28);
-            this.btnConnect.TabIndex = 52;
-            this.btnConnect.Text = "Connect";
-            this.btnConnect.UseVisualStyleBackColor = true;
             // 
             // txtDirectory
             // 
@@ -2590,27 +2574,69 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(484, 118);
+            this.label1.Location = new System.Drawing.Point(467, 118);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(147, 17);
             this.label1.TabIndex = 158;
             this.label1.Text = "Over-Smoke Setpoint:";
             // 
-            // textSmokeOverSet
+            // txtSmokeOverSet
             // 
-            this.textSmokeOverSet.Location = new System.Drawing.Point(696, 115);
-            this.textSmokeOverSet.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.textSmokeOverSet.Name = "textSmokeOverSet";
-            this.textSmokeOverSet.Size = new System.Drawing.Size(35, 22);
-            this.textSmokeOverSet.TabIndex = 159;
-            this.textSmokeOverSet.Text = "200";
+            this.txtSmokeOverSet.Location = new System.Drawing.Point(696, 115);
+            this.txtSmokeOverSet.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txtSmokeOverSet.Name = "txtSmokeOverSet";
+            this.txtSmokeOverSet.Size = new System.Drawing.Size(35, 22);
+            this.txtSmokeOverSet.TabIndex = 159;
+            this.txtSmokeOverSet.Text = "200";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(258, 78);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(123, 17);
+            this.label2.TabIndex = 160;
+            this.label2.Text = "Pause Fans (min):";
+            // 
+            // txtPauseFans
+            // 
+            this.txtPauseFans.Location = new System.Drawing.Point(390, 78);
+            this.txtPauseFans.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txtPauseFans.Name = "txtPauseFans";
+            this.txtPauseFans.Size = new System.Drawing.Size(35, 22);
+            this.txtPauseFans.TabIndex = 161;
+            this.txtPauseFans.Text = "5";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(255, 111);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(118, 27);
+            this.button1.TabIndex = 162;
+            this.button1.Text = "Data Directory";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.ButtonDataFolder_Click);
+            // 
+            // buttonCheckConnection
+            // 
+            this.buttonCheckConnection.Location = new System.Drawing.Point(989, 9);
+            this.buttonCheckConnection.Name = "buttonCheckConnection";
+            this.buttonCheckConnection.Size = new System.Drawing.Size(91, 28);
+            this.buttonCheckConnection.TabIndex = 163;
+            this.buttonCheckConnection.Text = "CheckConnection";
+            this.buttonCheckConnection.UseVisualStyleBackColor = true;
+            this.buttonCheckConnection.Click += new System.EventHandler(this.ButtonCheckConnection_Click);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1239, 750);
-            this.Controls.Add(this.textSmokeOverSet);
+            this.Controls.Add(this.buttonCheckConnection);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.txtPauseFans);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.txtSmokeOverSet);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label7);
@@ -2652,13 +2678,9 @@
             this.Controls.Add(this.labelEMSStop);
             this.Controls.Add(this.labelSmokeAlarm);
             this.Controls.Add(this.labelTempAlarm);
-            this.Controls.Add(this.btnSamplesList);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Controls.Add(this.btnChoosePath);
-            this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.btnStart);
-            this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.txtDirectory);
             this.Controls.Add(this.txtOperator);
             this.Controls.Add(this.lblDirectory);
@@ -2687,8 +2709,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Button btnSamplesList;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TextBox txtSetCurr12;
         private System.Windows.Forms.TextBox txtSetCurr11;
@@ -2846,11 +2866,8 @@
         private System.Windows.Forms.TextBox txtTempSensSample10;
         private System.Windows.Forms.TextBox txtTempSensSample11;
         private System.Windows.Forms.TextBox txtTempSensSample12;
-        private System.Windows.Forms.Button btnChoosePath;
-        private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.Button btnStart;
-        private System.Windows.Forms.Button btnConnect;
         private System.Windows.Forms.TextBox txtDirectory;
         private System.Windows.Forms.TextBox txtOperator;
         private System.Windows.Forms.Label lblDirectory;
@@ -2909,7 +2926,11 @@
         private System.Windows.Forms.Label labelSmoke1;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textSmokeOverSet;
+        private System.Windows.Forms.TextBox txtSmokeOverSet;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox txtPauseFans;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button buttonCheckConnection;
     }
 }
 

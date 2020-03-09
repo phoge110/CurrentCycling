@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="ArduinoMachine.cs" />
     <Compile Include="ArduinoUpdates.cs" />
+    <Compile Include="DataFile.cs" />
     <Compile Include="CurrentCycling.cs" />
     <Compile Include="TDK.cs" />
     <Compile Include="StartCyclingArgs.cs" />
@@ -110,6 +111,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\AircraftAlarm.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

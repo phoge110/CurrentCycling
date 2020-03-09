@@ -18,7 +18,7 @@ namespace Current_Cycling_Controls {
         public event CoreCommandEvent NewCoreCommand;
         public TransmitPacket _transmitPacket;
         public ArduinoMachine() {
-            _transmitPacket = new TransmitPacket("200", "200", "85", "25", "0", "0000000000000000", "00000000");
+            _transmitPacket = new TransmitPacket("200","200","85","25","0","0","0000000000000000","00000000");
         }
 
         public void StartArduinoMachine() {
@@ -84,7 +84,7 @@ namespace Current_Cycling_Controls {
         }
 
         private void SendPackets() {
-            _serArduino.WriteLine(_transmitPacket.ToCommaString());
+            _serArduino.WriteLine(_transmitPacket.ToStringPacket());
 
 
 
@@ -134,26 +134,31 @@ namespace Current_Cycling_Controls {
         private string BiasCurrentONTemp { get; set; }
         private string BiasCurrentOFFTemp { get; set; }
         private string BiasCurrentStatus { get; set; }
+        private string PauseFans { get; set; }
         private string ActiveTemps { get; set; }
         private string ActiveSmokes { get; set; }
             
         public TransmitPacket(string setTemp, string setSmoke, string biasONTemp,
-            string biasOFFTemp, string currentStatus, string activetemps, string activesmokes) {
+            string biasOFFTemp, string currentStatus, string pause, string activetemps, string activesmokes) {
             TempSetPoint = setTemp;
             SmokeSetPoint = setSmoke;
             BiasCurrentONTemp = biasONTemp;
             BiasCurrentOFFTemp = biasOFFTemp;
             BiasCurrentStatus = currentStatus;
-
+            PauseFans = pause;
             ActiveTemps = activetemps;
             ActiveSmokes = activesmokes;
 
         }
 
-        public string ToCommaString() {
+        public string ToStringPacket() {
             string[] str = { TempSetPoint, SmokeSetPoint, BiasCurrentONTemp, BiasCurrentOFFTemp,
-                ActiveTemps, ActiveSmokes};
-            return string.Join(",", str);
+                BiasCurrentStatus, PauseFans, ActiveTemps, ActiveSmokes};
+            string strr = string.Join(",", str);
+            strr = strr.Insert(0, "<");
+            strr += ">";
+            //Console.WriteLine($"{strr}");
+            return strr;
         }
 
     }

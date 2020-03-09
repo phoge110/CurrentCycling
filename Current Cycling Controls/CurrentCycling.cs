@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Timers;
 using System.IO.Ports;
 using System.ComponentModel;
+using System.IO;
 
 namespace Current_Cycling_Controls {
     public delegate void TDKEvent(object sender, GUIArgs e);
@@ -15,24 +16,47 @@ namespace Current_Cycling_Controls {
         private SerialPort _serTDK;
         private DateTime _cycleTimer = DateTime.Now;
         private Stopwatch _timer;
+        private Stopwatch _resultsTimer;
+        private Stopwatch _totalTimer;
+        private Stopwatch _intoCycleTimer;
         private bool _timeOut;
         public List<TDK> _TDK;
         public bool _updateRun;
         public GUIArgs _args;
+        public string _resultsDir;
         public bool STOP;
         public bool SMOKEALARM;
         public bool TEMPALARM;
         public bool BIASON;
+        public bool SAVE;
+        public List<double> _temps;
         public event CoreCommandEvent NewCoreCommand;
         public CurrentCycling() {
             // initialize
-            _serTDK = new SerialPort();
-            OpenPorts();
+            //_resultsWorker.DoWork += SaveTxtFiles;
+            
+        }
+
+        private string CompileDataStr(TDK t) {
+            string[] str = { t.CycleCount.ToString(), (DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds.ToString(),
+                (_totalTimer.ElapsedMilliseconds / 3.6E+6).ToString(), // total time (hrs)
+                (_intoCycleTimer.ElapsedMilliseconds / 60000.0).ToString(),
+                (BIASON) ? "ON" : "OFF",
+                t.SampleName, t.Current, t.Voltage, t.NumCells, t.Voc,
+                t.TempSensor, t.SetCurrent, "",
+                $"{_temps[0].ToString("F1")}",$"{_temps[1].ToString("F1")}",$"{_temps[2].ToString("F1")}",
+                $"{_temps[3].ToString("F1")}",$"{_temps[4].ToString("F1")}",$"{_temps[5].ToString("F1")}",
+                $"{_temps[6].ToString("F1")}",$"{_temps[7].ToString("F1")}",$"{_temps[8].ToString("F1")}",
+                $"{_temps[9].ToString("F1")}",$"{_temps[10].ToString("F1")}",$"{_temps[11].ToString("F1")}",
+                $"{_temps[12].ToString("F1")}",$"{_temps[13].ToString("F1")}",$"{_temps[14].ToString("F1")}",
+                $"{_temps[15].ToString("F1")}" };
+            return string.Join(",", str);
         }
 
 
         public void StartCycling(StartCyclingArgs args) {
-            // start serial interface stuff/ start timers
+            _serTDK = new SerialPort();
+            OpenPorts();
             var tdk = args.TDK;
             try {
                 foreach (var t in tdk) {
@@ -46,31 +70,46 @@ namespace Current_Cycling_Controls {
                         throw new Exception(exc.Message);
                     }
                 }
+                _TDK = tdk;
+                _resultsDir = args.ResultsDirectory;
+                _totalTimer = new Stopwatch();
+                _totalTimer.Start();
 
                 // Loop forever until we get a stop command from main thread
                 while (true) {
+                    _intoCycleTimer = new Stopwatch();
+                    _intoCycleTimer.Start();
+
                     // BIAS ON
                     foreach (var t in tdk) {
                         TurnON(t);
                     }
                     BIASON = true;
                     NewCoreCommand?.Invoke(this, new CoreCommand() { Type = U.CmdType.UpdateHeartBeatPacket });
-                    StartTimer();                    
+                    StartTimer();
+                    StartResultsTimer();
                     _cycleTimer = DateTime.Now.AddMilliseconds(args.BiasOnTime);
                     while (_timer.ElapsedMilliseconds < args.BiasOnTime
                         && !STOP && !TEMPALARM && !SMOKEALARM) {
+                        if (_resultsTimer.ElapsedMilliseconds > 1000) SAVE = true;
                         foreach (var tt in tdk) {
                             SetAddress(tt);
 
                             _serTDK.Write("MV?\r\n");
                             Wait(50); // lag in measured value
-                            string volt = _serTDK.ReadLine();
+                            tt.Voltage = _serTDK.ReadLine();
 
                             _serTDK.Write("MC?\r\n");
                             Wait(50);
-                            string current = _serTDK.ReadLine();
-                            _args = new GUIArgs(volt, current, tt.CycleCount, tt.Port, _cycleTimer);
+                            tt.Current = _serTDK.ReadLine();
+                            _args = new GUIArgs(tt.Voltage, tt.Current, tt.CycleCount, tt.Port, _cycleTimer);
                             NewCoreCommand?.Invoke(this, new CoreCommand() { Type = U.CmdType.UpdateUI });
+                            if (SAVE) SaveResults(tt);
+                        }
+                        // if we have saved then restart timer
+                        if (SAVE) {
+                            SAVE = false;
+                            _resultsTimer.Restart();
                         }
                     }
                     if (STOP || SMOKEALARM || TEMPALARM) break;
@@ -79,20 +118,30 @@ namespace Current_Cycling_Controls {
                     BIASON = false;
                     NewCoreCommand?.Invoke(this, new CoreCommand() { Type = U.CmdType.UpdateHeartBeatPacket });
                     StartTimer();
+                    StartResultsTimer();
                     _cycleTimer = DateTime.Now.AddMilliseconds(args.BiasOffTime);
                     while (_timer.ElapsedMilliseconds < args.BiasOffTime
                         && !STOP && !TEMPALARM && !SMOKEALARM) {
+                        if (_resultsTimer.ElapsedMilliseconds > 1000) SAVE = true;
                         foreach (var tt in tdk) {
                             _serTDK.Write("MV?\r\n");
                             Wait(50); // lag in measured value
-                            string volt = _serTDK.ReadLine();
+                            tt.Voltage = _serTDK.ReadLine();
 
                             _serTDK.Write("MC?\r\n");
                             Wait(50);
-                            string current = _serTDK.ReadLine();
-                            _args = new GUIArgs(volt, current, tt.CycleCount, tt.Port, _cycleTimer);
+                            tt.Current = _serTDK.ReadLine();
+                            _args = new GUIArgs(tt.Voltage, tt.Current, tt.CycleCount, tt.Port, _cycleTimer);
                             NewCoreCommand?.Invoke(this, new CoreCommand() { Type = U.CmdType.UpdateUI });
+                            if (SAVE) SaveResults(tt);
                         }
+
+                        // if we have saved then restart timer
+                        if (SAVE) {
+                            SAVE = false;
+                            _resultsTimer.Restart();
+                        }
+                        
                     }
                     if (STOP || SMOKEALARM || TEMPALARM) break;
 
@@ -100,7 +149,6 @@ namespace Current_Cycling_Controls {
                     foreach (var ttt in tdk) {
                         ttt.CycleCount++;
                     }
-
                 }               
             }
             catch (Exception exc) {
@@ -114,6 +162,14 @@ namespace Current_Cycling_Controls {
             SMOKEALARM = false;
             TEMPALARM = false;
             TurnOffClose(tdk);
+        }
+
+        private void SaveResults(TDK t) {
+            var str = CompileDataStr(t);
+            var path = _resultsDir + $"\\{t.SampleName}.txt";
+            using (var writer = new StreamWriter(path, true)) {
+                writer.WriteLine(str);
+            }
         }
 
         private void OpenPorts() {
@@ -158,12 +214,12 @@ namespace Current_Cycling_Controls {
         private void SetCurrentVoltage(TDK tdk) {
             // Sets the current limit of the power supply
             do {
-                _serTDK.Write("PC " + tdk.Current + "\r\n");
+                _serTDK.Write("PC " + tdk.SetCurrent + "\r\n");
                 if (_serTDK.ReadLine() == "OK") {
                     Console.WriteLine($"Current: OKAY");
                 }
                 _serTDK.Write("PC?\r\n");
-            } while (_serTDK.ReadLine() == tdk.Current);
+            } while (_serTDK.ReadLine() == tdk.SetCurrent);
 
             do {
                 //Sets the voltage of the power supply
@@ -226,7 +282,7 @@ namespace Current_Cycling_Controls {
                 _args = new GUIArgs(volt, current, tt.CycleCount, tt.Port, _cycleTimer);
                 NewCoreCommand?.Invoke(this, new CoreCommand() { Type = U.CmdType.UpdateUI });
             }
-            //_serTDK.Close();
+            _serTDK.Close();
         }
 
         private void StartTimer() {
@@ -234,13 +290,19 @@ namespace Current_Cycling_Controls {
             _timer.Start();
         }
 
+        private void StartResultsTimer() {
+            _resultsTimer = new Stopwatch();
+            _resultsTimer.Start();
+        }
+
         private void Wait(int t) {
             long elapsed = _timer.ElapsedMilliseconds;
             while (_timer.ElapsedMilliseconds - elapsed < t) { }
         }
 
-        public void Timeout(Object source, ElapsedEventArgs e) {
-            _timeOut = true;
+        private void WaitResults(int t) {
+            long elapsed = _resultsTimer.ElapsedMilliseconds;
+            while (_resultsTimer.ElapsedMilliseconds - elapsed < t) { }
         }
 
     }
