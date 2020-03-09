@@ -49,31 +49,33 @@ namespace Current_Cycling_Controls {
 
         private void OpenPorts() {
             string[] ports = SerialPort.GetPortNames();
-            _serArduino.BaudRate = 115200;
-            _serArduino.PortName = "COM6";
-            _serArduino.NewLine = "\r";
-            _serArduino.ReadTimeout = 2000;
-            _serArduino.Open();
-            //foreach (var port in ports) { // ping each port and see if we get the correct response
-            //    try {
-            //        _serArduino.BaudRate = 9600;
-            //        _serArduino.PortName = "COM4";
-            //        _serArduino.NewLine = "\r";
-            //        _serArduino.ReadTimeout = 1000;
-            //        _serArduino.Open();
+            bool connected = false;
+            _serArduino.Close();
+            while (!connected) {
+                foreach (var port in ports) { // ping each port and see if we get the correct response
+                    try {
+                        _serArduino.BaudRate = 115200;
+                        _serArduino.PortName = port; // com4
+                        _serArduino.NewLine = "\r";
+                        _serArduino.ReadTimeout = 2000;
+                        _serArduino.Open();
 
-            //        _serArduino.Write("ADR " + "01" + "\r\n");
-            //        try {
-            //            if (_serArduino.ReadLine() == "OK") {
-            //                continue;
-            //            }
-            //        }
-            //        catch (TimeoutException exc) {
-            //            return;
-            //        }
-            //    }
-            //    catch { }
-            //}
+                        var str = _serArduino.ReadLine().Split(',').Select(sValue => sValue.Trim()).ToList();
+                        if (str.Count == 28) {
+                            _serArduino.DiscardOutBuffer();
+                            _serArduino.DiscardInBuffer();
+                            connected = true;
+                            break;
+                        }
+                    }
+                    catch (Exception exc) {
+                        //Console.WriteLine($"{exc}");
+                        _serArduino.Close();
+                    }
+                        
+                }
+            }
+            
         }
 
         private void ReadPackets() {
@@ -85,8 +87,6 @@ namespace Current_Cycling_Controls {
 
         private void SendPackets() {
             _serArduino.WriteLine(_transmitPacket.ToStringPacket());
-
-
 
         }
 

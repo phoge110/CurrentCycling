@@ -32,9 +32,7 @@ namespace Current_Cycling_Controls {
         public List<double> _temps;
         public event CoreCommandEvent NewCoreCommand;
         public CurrentCycling() {
-            // initialize
-            //_resultsWorker.DoWork += SaveTxtFiles;
-            
+
         }
 
         private string CompileDataStr(TDK t) {
@@ -174,22 +172,10 @@ namespace Current_Cycling_Controls {
 
         private void OpenPorts() {
             string[] ports = SerialPort.GetPortNames();
-            // only one COM port available
-            if (ports.Length == 1) {
-                _serTDK.BaudRate = U.BaudRate;
-                _serTDK.PortName = ports.FirstOrDefault();
-                _serTDK.NewLine = "\r";
-                _serTDK.ReadTimeout = 1000;
-                _serTDK.Open();
-
-                _serTDK.DiscardOutBuffer();
-                _serTDK.DiscardInBuffer();
-                return;
-            }
             foreach (var port in ports) { // ping each port and see if we get the correct response
                 try {
                     _serTDK.BaudRate = U.BaudRate;
-                    _serTDK.PortName = U.COMPort;
+                    _serTDK.PortName = port; // com3
                     _serTDK.NewLine = "\r";
                     _serTDK.ReadTimeout = 1000;
                     _serTDK.Open();
@@ -201,7 +187,7 @@ namespace Current_Cycling_Controls {
                         return;
                     }
                 }
-                catch { }
+                catch (Exception exc) { _serTDK.Close(); }
             }
         }
 

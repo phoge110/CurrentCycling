@@ -540,21 +540,26 @@ namespace Current_Cycling_Controls
 
         public List<string> CheckConnection() {
             var ser = new SerialPort();
-            ser.BaudRate = U.BaudRate;
-            ser.PortName = U.COMPort;
-            ser.NewLine = "\r";
-            ser.ReadTimeout = 100;
             var connectLabels = new List<string>();
-            try {
-                ser.Open();
+            string[] ports = SerialPort.GetPortNames();
+            foreach (var port in ports) { // ping each port and see if we get the correct response
+                try {
+                    ser.BaudRate = U.BaudRate;
+                    ser.PortName = port;
+                    ser.NewLine = "\r";
+                    ser.ReadTimeout = 1000;
+                    ser.Open();
+
+                    ser.Write("ADR " + "01" + "\r\n");
+                    if (ser.ReadLine() == "OK") {
+                        ser.DiscardOutBuffer();
+                        ser.DiscardInBuffer();
+                        break;
+                    }
+                }
+                catch { }
             }
-            catch (Exception exc) {
-                Console.WriteLine($"Unable to access TDK COM Port!");
-                Console.WriteLine($"{exc}");
-                connectLabels.AddRange(Enumerable.Repeat("Not Connected", 12));
-                return connectLabels;
-            }
-            
+
 
             for (var i = 1; i < 13; i++) {
                 try {
